@@ -10,6 +10,7 @@ import sys
 import warnings
 
 import bs4
+import requests
 
 from gdown.download import _get_session
 from gdown import *
@@ -113,7 +114,14 @@ def _download_and_parse_google_drive_link(
     else:
         url += "?hl=en"
 
-    res = sess.get(url, verify=verify)
+    try:
+        res = sess.get(url, verify=verify)
+    except requests.exceptions.ProxyError as e:
+        print(
+            "An error has occurred using proxy:", sess.proxies, file=sys.stderr
+        )
+        print(e, file=sys.stderr)
+        return False, None
 
     if res.status_code != 200:
         return False, None
@@ -159,22 +167,26 @@ def _download_and_parse_google_drive_link(
         gdrive_file.children.append(child)
     has_at_least_max_files = len(gdrive_file.children) == MAX_NUMBER_FILES
     if not remaining_ok and has_at_least_max_files:
-        message = " ".join(
+        err_msg = " ".join(
             [
                 "The gdrive folder with url: {url}".format(url=url),
                 "has more than {max} files,".format(max=MAX_NUMBER_FILES),
-                "gdrive can't download more than this limit.",
+                "gdrive can't download more than this limit,",
+                "if you are ok with this,",
+                "please run again with --remaining-ok flag.",
             ]
         )
-        raise exceptions.FolderContentsMaximumLimitError(message)
+        raise RuntimeError(err_msg)
     return return_code, gdrive_file
+
 
 def _get_directory_structure(gdrive_file, previous_path):
     """Converts a Google Drive folder structure into a local directory list."""
 
     directory_structure = []
     counter = 1
-    for file in gdrive_file.children:
+    dummy = gdrive_file.children
+    for file in random.sample(dummy, 100 if len(dummy) > 100 else len(dummy)):
         file.name = "video%d.%s" % (counter, file.name.rsplit(".", maxsplit=1)[-1])
         if file.is_folder():
             directory_structure.append(
@@ -269,10 +281,6 @@ def download_folder(
     if not quiet:
         print("Building directory structure completed")
     filenames = []
-    # ######################
-    # Changes Made here
-    # ######################
-    directory_structure = random.sample(directory_structure, 100 if len(directory_structure) > 100 else len(directory_structure))
     for file_id, file_path in directory_structure:
         if file_id is None:  # folder
             if not osp.exists(file_path):
