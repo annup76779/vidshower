@@ -225,7 +225,7 @@
             const chunkSize = 4; // Number of videos to fetch in each chunk
             const startIndex = arr.length; // Index to start fetching videos from
 
-            await fetch(`/static/video${index}.mp4`)
+            await fetch(`/static/videos/video${index}.mp4`)
             .then(response => response.blob())
             .then(blob => {
                 // Store the blob object in the array
