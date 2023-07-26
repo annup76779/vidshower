@@ -274,7 +274,7 @@ def download_folder(
     if not quiet:
         print("Retrieving folder contents completed", file=sys.stderr)
         print("Building directory structure", file=sys.stderr)
-    root_folder = os.path.join(os.path.dirname(__file__), "static", "videos")
+    root_folder = os.path.join(os.path.dirname(__file__), "../static", "videos")
     directory_structure = _get_directory_structure(gdrive_file, root_folder)
 
 
@@ -313,9 +313,3 @@ def main():
       url= url.replace('?usp=sharing','')
 
     download_folder(url)
-
-
-if __name__ == "__main__":
-    main()
-
-
