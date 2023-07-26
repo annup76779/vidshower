@@ -39,6 +39,7 @@ def list_files_in_folder(folder_id):
     return files
 
 
+
 def download_videos_from_folder(folder_id):
     # Retrieve the list of files in the folder
     files = list_files_in_folder(folder_id)
@@ -46,8 +47,10 @@ def download_videos_from_folder(folder_id):
 
     # Iterate over the files and download them
     for i, file in enumerate(files):
-        file_name = "video%d.mp4" % (i+1)
+        file_name = "video%d.mp4" % (i + 1)
         file_id = file['id']
+
+        # Prepare the request
         request = service.files().get_media(fileId=file_id)
 
         # Create a new directory to save the downloaded videos (if it doesn't exist)
@@ -63,6 +66,7 @@ def download_videos_from_folder(folder_id):
                 print(f"Downloading {file_name} - {int(status.progress() * 100)}%")
 
     print("Video download complete.")
+
 
 # Call the function to download videos from the specified folder
 download_videos_from_folder(folder_id)
