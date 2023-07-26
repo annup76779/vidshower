@@ -7,11 +7,10 @@ from google.oauth2.credentials import Credentials
 # Set up the Google Drive API credentials
 # Make sure you have the necessary credentials file (client_secrets.json) and token file (token.json)
 # Replace 'YOUR_CREDENTIALS_FILE.json' with the path to your credentials file
-credentials_file = 'client_secret_420422691379-6q4kd42f3c1g692lii9m353m3tbada4i.apps.googleusercontent.com.json'
+credentials_file = 'client_secret.json'
 scopes = ['https://www.googleapis.com/auth/drive.readonly']
 with open(os.path.join(os.path.dirname(os.path.basename(__file__)), credentials_file), "r") as config:
     config = json.load(config)
-    print(config)
     credentials = Credentials.from_authorized_user_info(info=config.get("installed"), scopes=scopes)
 
 
@@ -28,14 +27,12 @@ def list_files_in_folder(folder_id):
     while True:
         # Fetch a batch of files (maximum 100 per request)
         files_obj = service.files()
-        print(files_obj)
         response = files_obj.list(q=f"'{folder_id}' in parents",
                                         fields="files(name, id)",
                                         pageSize=500,
                                         pageToken=page_token).execute()
         files.extend(response.get('files', []))
         page_token = response.get('nextPageToken')
-        print(page_token)
         if not page_token:
             break
 
@@ -54,7 +51,7 @@ def download_videos_from_folder(folder_id):
         request = service.files().get_media(fileId=file_id)
 
         # Create a new directory to save the downloaded videos (if it doesn't exist)
-        save_directory = 'static'
+        save_directory = os.path.join(os.path.dirname(__file__), '../static', "videos")
         os.makedirs(save_directory, exist_ok=True)
 
         # Download the video file

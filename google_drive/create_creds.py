@@ -5,7 +5,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly", ]
+SCOPES = ["https://www.googleapis.com/auth/drive.readonly", ]
 
 
 def create_refresh_creds():
@@ -22,7 +22,7 @@ def create_refresh_creds():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                os.path.join(os.path.dirname(__file__), 'client_secret_420422691379-6q4kd42f3c1g692lii9m353m3tbada4i.apps.googleusercontent.com.json'), SCOPES)
+                os.path.join(os.path.dirname(__file__), 'client_secret.json'), SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open(os.path.join(os.path.dirname(__file__), 'client_credentials.json'), 'w') as token:
